@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Questionário e Diagnóstico de Segurança Viária - ONSV</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* O CSS permanece o mesmo da versão anterior */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #6c757d;
+      --accent-color: #ffc107;
+      --background-light: #f4f7f6;
+      --background-white: #ffffff;
+      --text-dark: #343a40;
+      --text-muted: #868e96;
+      --border-color: #e9ecef;
+      --border-radius-lg: 12px;
+      --border-radius-md: 8px;
+      --box-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --status-ausencia: #dc3545;
+      --status-inicial: #ffc107;
+      --status-intermediaria: #17a2b8;
+      --status-avancada: #28a745;
+    }
+    html {
+        scroll-behavior: smooth; /* Habilita a rolagem suave */
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background-light);
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.6;
+      color: var(--text-dark);
+    }
+    .container-principal {
+      width: 100%;
+      max-width: 1024px;
+      background: var(--background-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--box-shadow-light);
+      overflow: hidden;
+    }
+    .progresso-header {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .progresso-header h2 { 
+      margin: 0; 
+      font-weight: 600; 
+      font-size: 1.6rem;
+    }
+    .status {
+      font-size: 1rem;
+      opacity: .95;
+    }
+    #autoavaliacao-form { padding: 30px; }
+    .categoria-passo { display: none; }
+    .categoria-passo.ativo { display: block; animation: fadeIn .4s ease-out; }
+    @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
+    
+    .categoria-passo h3 {
+      margin: 0 0 25px;
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 10px;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .pergunta { 
+      margin: 25px 0; 
+      padding: 20px; 
+      border: 1px solid var(--border-color); 
+      border-radius: var(--border-radius-md); 
+      background-color: #fcfcfc;
+      transition: all 0.2s ease;
+    }
+    .pergunta:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .pergunta h4 { 
+      margin: 0 0 12px; 
+      font-size: 1.15rem; 
+      color: var(--text-dark); 
+      font-weight: 500;
+    }
+    .hint { 
+      font-size: .95rem; 
+      color: var(--text-muted); 
+      margin: 8px 0 15px;
+      font-style: italic;
+    }
+    .opcoes-resposta label {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 18px; 
+      border: 1px solid var(--border-color); 
+      border-radius: var(--border-radius-md); 
+      margin: 10px 0;
+      cursor: pointer; 
+      transition: .2s border-color, .2s background-color, .2s box-shadow;
+      background-color: var(--background-white);
+    }
+    .opcoes-resposta label:hover { 
+      background: var(--background-light); 
+      border-color: var(--primary-color);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .opcoes-resposta input[type="radio"] { 
+      margin-top: 4px; 
+      min-width: 18px;
+      min-height: 18px;
+      accent-color: var(--primary-color);
+    }
+    .opcoes-resposta label:has(input[type="radio"]:checked) { 
+      border-color: var(--primary-color); 
+      background: #eef7ff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .opcoes-resposta label span {
+        font-size: 1rem;
+        color: var(--text-dark);
+    }
+
+    .navegacao-botoes {
+      display: flex; justify-content: space-between; align-items: center; gap: 15px;
+      margin-top: 30px; 
+      padding-top: 20px; 
+      border-top: 1px solid var(--border-color);
+    }
+    .btn {
+      padding: 12px 25px; 
+      border: none; 
+      border-radius: var(--border-radius-md); 
+      font-weight: 600; 
+      cursor: pointer;
+      transition: .2s transform, .2s background-color, .2s box-shadow;
+      font-size: 1rem;
+      flex-grow: 1;
+      max-width: 250px;
+    }
+    @media (min-width: 768px) {
+        .btn {
+            flex-grow: 0;
+        }
+    }
+    .btn:active { transform: translateY(1px); }
+    #btn-anterior { 
+      background: var(--secondary-color); 
+      color: #fff; 
+    }
+    #btn-anterior:hover {
+        background: #5a6268;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #btn-proximo { 
+      background: var(--primary-color); 
+      color: #fff; 
+    }
+    #btn-proximo:hover {
+        background: #0056b3;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .condHidden { display: none !important; }
+
+    #diagnostico-container {
+      padding: 30px;
+      animation: fadeIn .5s ease-out;
+    }
+    .diagnostico-header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 20px;
+    }
+    .diagnostico-header h2 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+    .diagnostico-header p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+    }
+    .diagnostico-section {
+      margin-bottom: 50px;
+      background: var(--background-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--box-shadow-light);
+      padding: 30px;
+    }
+    .diagnostico-section h3 {
+      color: var(--primary-color);
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+    
+    #radar-chart-container {
+        position: relative;
+        height: 50vh;
+        min-height: 450px;
+        width: 100%;
+    }
+
+    #tabela-desempenho-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+    .dominio-grupo {
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      padding: 20px;
+      background-color: #fdfdfd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .dominio-grupo h4 {
+        margin: 0 0 15px 0;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    .subdominio-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: var(--border-radius-md);
+        background: var(--background-white);
+        border: 1px solid #f0f0f0;
+        font-size: 0.95rem;
+    }
+    .subdominio-item:last-child { margin-bottom: 0; }
+    .subdominio-item span {
+        color: var(--text-dark);
+    }
+
+    .cor-desempenho {
+        min-width: 90px;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 5px;
+        color: white;
+        font-weight: 500;
+        font-size: 0.85rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .cor-desempenho[data-label="Ausência"] { background-color: var(--status-ausencia); }
+    .cor-desempenho[data-label="Inicial"] { background-color: var(--status-inicial); }
+    .cor-desempenho[data-label="Intermediária"] { background-color: var(--status-intermediaria); }
+    .cor-desempenho[data-label="Avançada"] { background-color: var(--status-avancada); }
+    .cor-desempenho[data-label="Não se aplica"] { background-color: var(--status-nao-aplica); }
+
+    .grafico-barra-container {
+        margin-bottom: 40px;
+        padding: 25px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        background-color: var(--background-white);
+        box-shadow: var(--box-shadow-light);
+    }
+    .grafico-barra-container:last-child {
+        margin-bottom: 0;
+    }
+    .grafico-barra-container h4 {
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        border-bottom: 1px dashed var(--border-color);
+        padding-bottom: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        body { padding: 15px; }
+        .container-principal { border-radius: 8px; }
+        .progresso-header { 
+          flex-direction: column; 
+          text-align: center;
+          padding: 18px 20px;
+        }
+        .progresso-header h2 { font-size: 1.4rem; }
+        .status { font-size: 0.9rem; }
+        #autoavaliacao-form, #diagnostico-container { padding: 20px; }
+        .categoria-passo h3 { font-size: 1.2rem; margin-bottom: 20px; }
+        .pergunta { padding: 15px; margin: 20px 0; }
+        .pergunta h4 { font-size: 1rem; }
+        .opcoes-resposta label { padding: 12px 15px; font-size: 0.9rem; }
+        .navegacao-botoes { flex-direction: column; gap: 10px; }
+        .btn { width: 100%; max-width: 100%; }
+
+        .diagnostico-header h2 { font-size: 1.7rem; }
+        .diagnostico-header p { font-size: 1rem; }
+        .diagnostico-section { padding: 20px; margin-bottom: 30px; }
+        .diagnostico-section h3 { font-size: 1.3rem; }
+        #radar-chart-container { min-height: 350px; }
+        .dominio-grupo h4 { font-size: 1.15rem; }
+        .subdominio-item { font-size: 0.9rem; padding: 8px 10px; }
+        .cor-desempenho { min-width: 80px; font-size: 0.8rem; padding: 5px 8px; }
+        .grafico-barra-container { padding: 15px; margin-bottom: 30px; }
+        .grafico-barra-container h4 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-principal">
+  <div id="questionario-wrapper">
+    <header class="progresso-header">
+      <h2>Autoavaliação de Segurança Viária</h2>
+      <div class="status">
+        Categoria <strong><span id="categoria-atual">1</span></strong> de <strong><span id="categoria-total">10</span></strong>
+      </div>
+    </header>
+    <form id="autoavaliacao-form" onsubmit="return false;">
+      <div class="categoria-passo ativo" id="categoria-1">
+        <h3>1. Perguntas Iniciais</h3>
+        <div class="pergunta" id="q1_regiao_pop">
+          <h4>O município faz parte de uma região metropolitana? Qual a população do município?</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_true|pop_20k" required><span> Faz parte de uma região metropolitana, e tem até 20 mil habitantes</span></label>
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_true|pop_500k"><span> Faz parte de uma região metropolitana, e tem entre 20 e 500 mil habitantes</span></label>
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_true|pop_over_500k"><span> Faz parte de uma região metropolitana, e tem mais de 500 mil habitantes</span></label>
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_false|pop_20k"><span> Não faz parte de uma região metropolitana, e tem até 20 mil habitantes</span></label>
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_false|pop_500k"><span> Não faz parte de uma região metropolitana, e tem entre 20 e 500 mil habitantes</span></label>
+            <label><input type="radio" name="p1_1_pop_regiao" value="regiao_false|pop_over_500k"><span> Não faz parte de uma região metropolitana, e tem mais de 500 mil habitantes</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q1_municipalizado">
+          <h4>O trânsito do município é municipalizado?</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p1_2_municipalizado" value="true" required><span> Sim</span></label>
+            <label><input type="radio" name="p1_2_municipalizado" value="false"><span> Não</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-2">
+        <h3>2. Legislação Urbanística</h3>
+        <div class="pergunta" id="q2_plano_diretor">
+          <h4>Plano Diretor</h4>
+          <p class="hint">(Somente para municípios entre 20 e 500 mil habitantes ou com mais de 500 mil.)</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p2_1_plano_diretor" value="Prática inicial"> <span>Prática inicial — O município já iniciou o processo de elaboração do seu Plano Diretor (já fora do prazo).</span></label>
+            <label><input type="radio" name="p2_1_plano_diretor" value="Prática intermediária"> <span>Prática intermediária — O município elaborou seu Plano Diretor fora do prazo previsto.</span></label>
+            <label><input type="radio" name="p2_1_plano_diretor" value="Melhor prática"> <span>Melhor prática — O município elaborou seu Plano Diretor no prazo previsto.</span></label>
+            <label><input type="radio" name="p2_1_plano_diretor" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q2_plano_mobilidade">
+          <h4>Plano de Mobilidade</h4>
+          <p class="hint">(Somente para municípios entre 20 e 500 mil habitantes ou com mais de 500 mil.)</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p2_2_plano_mobilidade" value="Prática inicial"> <span>Prática inicial — O município já iniciou o processo de elaboração do seu Plano de Mobilidade (fora do prazo).</span></label>
+            <label><input type="radio" name="p2_2_plano_mobilidade" value="Prática intermediária"> <span>Prática intermediária — O município elaborou seu Plano de Mobilidade fora do prazo previsto.</span></label>
+            <label><input type="radio" name="p2_2_plano_mobilidade" value="Melhor prática"> <span>Melhor prática — O município elaborou seu Plano de Mobilidade no prazo previsto.</span></label>
+            <label><input type="radio" name="p2_2_plano_mobilidade" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q2_compatibilizacao">
+          <h4>Compatibilização entre os planos</h4>
+          <p class="hint">(Somente para municípios entre 20 e 500 mil habitantes ou com mais de 500 mil.)</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p2_3_compatibilizacao" value="Prática inicial"> <span>Prática inicial — Instrumentos elaborados, porém sem processo de compatibilização.</span></label>
+            <label><input type="radio" name="p2_3_compatibilizacao" value="Prática intermediária"> <span>Prática intermediária — Instrumentos elaborados e em processo de compatibilização.</span></label>
+            <label><input type="radio" name="p2_3_compatibilizacao" value="Melhor prática"> <span>Melhor prática — Houve compatibilização de todos os instrumentos.</span></label>
+            <label><input type="radio" name="p2_3_compatibilizacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q2_ptui">
+            <h4>Plano de Transporte Urbano Integrado</h4>
+            <p class="hint">(Somente para municípios com mais de 500 mil habitantes.)</p>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p2_4_ptui" value="Prática inicial"> <span>Prática inicial — Processo iniciado (fora do prazo).</span></label>
+                <label><input type="radio" name="p2_4_ptui" value="Prática intermediária"> <span>Prática intermediária — Elaborado fora do prazo.</span></label>
+                <label><input type="radio" name="p2_4_ptui" value="Melhor prática"> <span>Melhor prática — Elaborado no prazo previsto.</span></label>
+                <label><input type="radio" name="p2_4_ptui" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+        <div class="pergunta" id="q2_pdui">
+            <h4>Plano de Desenvolvimento Urbano Integrado (Região Metropolitana)</h4>
+            <p class="hint">(Somente para municípios entre 20 e 500 mil ou com mais de 500 mil que façam parte de RM.)</p>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p2_5_pdui" value="Prática inicial"> <span>Prática inicial — A RM iniciou a elaboração do PDUI.</span></label>
+                <label><input type="radio" name="p2_5_pdui" value="Prática intermediária"> <span>Prática intermediária — PDUI concluído, porém com dificuldades de planejamento integrado.</span></label>
+                <label><input type="radio" name="p2_5_pdui" value="Melhor prática"> <span>Melhor prática — PDUI concluído e poucas dificuldades para o planejamento integrado.</span></label>
+                <label><input type="radio" name="p2_5_pdui" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-3">
+        <h3>3. Municipalização do Trânsito</h3>
+        <p class="hint">(Somente para municípios com trânsito municipalizado.)</p>
+        <div class="pergunta" id="q3_snt">
+            <h4>Processo de integração ao SNT</h4>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p3_1_snt" value="Prática inicial"> <span>Prática inicial — Processo iniciado, com dificuldades em algum elemento da estrutura necessária.</span></label>
+                <label><input type="radio" name="p3_1_snt" value="Prática intermediária"> <span>Prática intermediária — Municipalização concluída, porém com dificuldades nas ações de engenharia, fiscalização e educação.</span></label>
+                <label><input type="radio" name="p3_1_snt" value="Melhor prática"> <span>Melhor prática — Municipalização plenamente concluída, com ações efetivas de engenharia, fiscalização e educação.</span></label>
+                <label><input type="radio" name="p3_1_snt" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+        <div class="pergunta" id="q3_engenharia">
+            <h4>Área de engenharia</h4>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p3_2_engenharia" value="Prática inicial"> <span>Prática inicial — Não há equipe de engenharia/arquitetura responsável.</span></label>
+                <label><input type="radio" name="p3_2_engenharia" value="Prática intermediária"> <span>Prática intermediária — Há equipe pouco estruturada.</span></label>
+                <label><input type="radio" name="p3_2_engenharia" value="Melhor prática"> <span>Melhor prática — Há equipe habilitada responsável por estudos e intervenções.</span></label>
+                <label><input type="radio" name="p3_2_engenharia" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+        <div class="pergunta" id="q3_fiscalizacao">
+            <h4>Área de fiscalização</h4>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p3_3_fiscalizacao" value="Prática inicial"> <span>Prática inicial — Não há equipe que atue constantemente.</span></label>
+                <label><input type="radio" name="p3_3_fiscalizacao" value="Prática intermediária"> <span>Prática intermediária — Há equipe, porém com dificuldades operacionais.</span></label>
+                <label><input type="radio" name="p3_3_fiscalizacao" value="Melhor prática"> <span>Melhor prática — Há equipe fixa com atuação continuada.</span></label>
+                <label><input type="radio" name="p3_3_fiscalizacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+        <div class="pergunta" id="q3_educacao">
+            <h4>Área de educação</h4>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p3_4_educacao" value="Prática inicial"> <span>Prática inicial — Ações isoladas por diferentes órgãos.</span></label>
+                <label><input type="radio" name="p3_4_educacao" value="Prática intermediária"> <span>Prática intermediária — Ações continuadas com planejamento, sem Escola Pública de Trânsito.</span></label>
+                <label><input type="radio" name="p3_4_educacao" value="Melhor prática"> <span>Melhor prática — Ações continuadas com planejamento e Escola Pública de Trânsito atuante.</span></label>
+                <label><input type="radio" name="p3_4_educacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+        <div class="pergunta" id="q3_multas">
+            <h4>Recurso das multas</h4>
+            <div class="opcoes-resposta">
+                <label><input type="radio" name="p3_5_multas" value="Prática inicial"> <span>Prática inicial — Apesar da JARI, há dificuldades no acesso ao recurso das multas.</span></label>
+                <label><input type="radio" name="p3_5_multas" value="Prática intermediária"> <span>Prática intermediária — Apesar da JARI, há dificuldades para aplicação dos recursos.</span></label>
+                <label><input type="radio" name="p3_5_multas" value="Melhor prática"> <span>Melhor prática — Há JARI e os recursos das multas são aplicados em projetos de trânsito.</span></label>
+                <label><input type="radio" name="p3_5_multas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-4">
+        <h3>4. Transporte Não Motorizado</h3>
+        <div class="pergunta" id="q4_planejamento_ciclo">
+          <h4>Planejamento cicloviário</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_1_planejamento" value="Prática inicial"> <span>Prática inicial — Projetos isolados para expansão de ciclovias/ciclofaixas/bicicletários/paraciclos.</span></label>
+            <label><input type="radio" name="p4_1_planejamento" value="Prática intermediária"> <span>Prática intermediária — Plano cicloviário com metas de expansão da infraestrutura.</span></label>
+            <label><input type="radio" name="p4_1_planejamento" value="Melhor prática"> <span>Melhor prática — Plano cicloviário com metas integrado ao sistema de transporte urbano e controle de estatísticas de ciclistas/acidentes.</span></label>
+            <label><input type="radio" name="p4_1_planejamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q4_expansao_rede">
+          <h4>Expansão da rede cicloviária (últimos 5 anos)</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_2_expansao" value="Prática inicial"> <span>Prática inicial — Não houve iniciativas de expansão.</span></label>
+            <label><input type="radio" name="p4_2_expansao" value="Prática intermediária"> <span>Prática intermediária — Expansão ocasional, sem atender adequadamente à demanda.</span></label>
+            <label><input type="radio" name="p4_2_expansao" value="Melhor prática"> <span>Melhor prática — Expansão frequente, sistema em crescimento contínuo.</span></label>
+            <label><input type="radio" name="p4_2_expansao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q4_estacionamento_bike">
+          <h4>Estacionamento para bicicletas</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_3_estacionamento" value="Prática inicial"> <span>Prática inicial — Disponibilidade depende de iniciativas individuais.</span></label>
+            <label><input type="radio" name="p4_3_estacionamento" value="Prática intermediária"> <span>Prática intermediária — Disponível em alguns terminais e polos geradores.</span></label>
+            <label><input type="radio" name="p4_3_estacionamento" value="Melhor prática"> <span>Melhor prática — Disponível nos principais terminais e prédios públicos, com legislação municipal para mínimos em privados.</span></label>
+            <label><input type="radio" name="p4_3_estacionamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q4_calcadas_manutencao">
+          <h4>Programa de manutenção e extensão de calçadas</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_4_calcadas" value="Prática inicial"> <span>Prática inicial — Projetos isolados de calçadas/meio-fio/acessibilidade.</span></label>
+            <label><input type="radio" name="p4_4_calcadas" value="Prática intermediária"> <span>Prática intermediária — Plano de extensão com metas de expansão da infraestrutura.</span></label>
+            <label><input type="radio" name="p4_4_calcadas" value="Melhor prática"> <span>Melhor prática — Plano com metas de expansão e melhoria + plano integrado de circulação de pedestres.</span></label>
+            <label><input type="radio" name="p4_4_calcadas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q4_pcd">
+          <h4>Programa de adequação de calçadas/meio-fio para PCD</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_5_pcd" value="Prática inicial"> <span>Prática inicial — Iniciativas isoladas.</span></label>
+            <label><input type="radio" name="p4_5_pcd" value="Prática intermediária"> <span>Prática intermediária — Há um plano de adequação.</span></label>
+            <label><input type="radio" name="p4_5_pcd" value="Melhor prática"> <span>Melhor prática — Plano com metas e controle de resultados, em expansão frequente.</span></label>
+            <label><input type="radio" name="p4_5_pcd" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q4_seguranca_publica">
+          <h4>Condições da segurança pública que afetam a demanda</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p4_6_seg_pub" value="Prática inicial"> <span>Prática inicial — Reconhece associação com segurança pública, porém iluminação/policiamento deixam a desejar.</span></label>
+            <label><input type="radio" name="p4_6_seg_pub" value="Prática intermediária"> <span>Prática intermediária — Boa iluminação e presença de policiamento.</span></label>
+            <label><input type="radio" name="p4_6_seg_pub" value="Melhor prática"> <span>Melhor prática — Boa iluminação + policiamento + controle estatístico de violência com ações mitigadoras.</span></label>
+            <label><input type="radio" name="p4_6_seg_pub" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-5">
+        <h3>5. Monitoramento</h3>
+        <div class="pergunta" id="q5_estatistica">
+          <h4>Estatística de acidentes</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p5_1_estatistica" value="Prática inicial"> <span>Prática inicial — Bancos de dados distintos sem base única compatibilizada.</span></label>
+            <label><input type="radio" name="p5_1_estatistica" value="Prática intermediária"> <span>Prática intermediária — Base única compatibilizada, porém sem complementação pós-acidente.</span></label>
+            <label><input type="radio" name="p5_1_estatistica" value="Melhor prática"> <span>Melhor prática — Base única compatibilizada com complementação pós-acidente.</span></label>
+            <label><input type="radio" name="p5_1_estatistica" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q5_planejamento_monitoramento">
+          <h4>Planejamento e monitoramento das ações</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p5_2_planejamento" value="Prática inicial"> <span>Prática inicial — Estatísticas orientam o planejamento, sem monitoramento de efetividade.</span></label>
+            <label><input type="radio" name="p5_2_planejamento" value="Prática intermediária"> <span>Prática intermediária — Estatísticas orientam e há monitoramento de efetividade.</span></label>
+            <label><input type="radio" name="p5_2_planejamento" value="Melhor prática"> <span>Melhor prática — Estatísticas orientam, há monitoramento e decisões para disseminar/extinguir práticas.</span></label>
+            <label><input type="radio" name="p5_2_planejamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-6">
+        <h3>6. Gestão da Velocidade</h3>
+        <div class="pergunta" id="q6_controle_eletronico">
+          <h4>Controle eletrônico da velocidade</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p6_1_controle" value="Prática inicial"> <span>Prática inicial — Há dispositivos, mas sem análise técnica formal.</span></label>
+            <label><input type="radio" name="p6_1_controle" value="Prática intermediária"> <span>Prática intermediária — Há dispositivos e implantação depende de análises técnicas formais.</span></label>
+            <label><input type="radio" name="p6_1_controle" value="Melhor prática"> <span>Melhor prática — Há dispositivos + política formal de controle eletrônico no município.</span></label>
+            <label><input type="radio" name="p6_1_controle" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q6_medidas_fisicas">
+          <h4>Medidas físicas de controle de velocidade</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p6_2_medidas" value="Prática inicial"> <span>Prática inicial — Restritas a lombadas e travessias elevadas.</span></label>
+            <label><input type="radio" name="p6_2_medidas" value="Prática intermediária"> <span>Prática intermediária — Ações isoladas de moderação de tráfego.</span></label>
+            <label><input type="radio" name="p6_2_medidas" value="Melhor prática"> <span>Melhor prática — Política de moderação de tráfego (adequação de infraestrutura para reduzir velocidade).</span></label>
+            <label><input type="radio" name="p6_2_medidas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-7">
+        <h3>7. Educação para o Trânsito</h3>
+        <div class="pergunta" id="q7_escolas">
+          <h4>Ações continuadas em escolas municipais</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p7_1_escolas" value="Prática inicial"> <span>Prática inicial — Poucas ações.</span></label>
+            <label><input type="radio" name="p7_1_escolas" value="Prática intermediária"> <span>Prática intermediária — Ações com atividades práticas/informativas, sem planejamento periódico.</span></label>
+            <label><input type="radio" name="p7_1_escolas" value="Melhor prática"> <span>Melhor prática — Ações continuadas e frequentes, dentro de planejamento municipal periódico.</span></label>
+            <label><input type="radio" name="p7_1_escolas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q7_sociedade">
+          <h4>Ações continuadas para a sociedade em geral</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p7_2_sociedade" value="Prática inicial"> <span>Prática inicial — Poucas ações.</span></label>
+            <label><input type="radio" name="p7_2_sociedade" value="Prática intermediária"> <span>Prática intermediária — Ações com atividades práticas/informativas, sem planejamento periódico.</span></label>
+            <label><input type="radio" name="p7_2_sociedade" value="Melhor prática"> <span>Melhor prática — Ações continuadas e frequentes, dentro de planejamento municipal periódico.</span></label>
+            <label><input type="radio" name="p7_2_sociedade" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-8">
+        <h3>8. Controle de Tráfego</h3>
+        <div class="pergunta" id="q8_estrategias">
+          <h4>Estratégias de controle de tráfego (placas, semáforos e rotatórias)</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p8_1_estrategias" value="Prática inicial"> <span>Prática inicial — Apenas semáforos são utilizados como estratégia adicional.</span></label>
+            <label><input type="radio" name="p8_1_estrategias" value="Prática intermediária"> <span>Prática intermediária — Semáforos e rotatórias são utilizados.</span></label>
+            <label><input type="radio" name="p8_1_estrategias" value="Melhor prática"> <span>Melhor prática — Semáforos e rotatórias com avaliação de efetividade da implantação.</span></label>
+            <label><input type="radio" name="p8_1_estrategias" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q8_tecnologia">
+          <h4>Tecnologia no controle semafórico</h4>
+          <p class="hint">Coordenação semafórica, controle de avanço de sinal e semáforos atuados pelo tráfego. (Exibir apenas se a 8.1 não for “Sem práticas relacionadas no município”.)</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p8_2_tecnologia" value="Prática inicial"> <span>Prática inicial — Uso de uma ou duas das tecnologias.</span></label>
+            <label><input type="radio" name="p8_2_tecnologia" value="Prática intermediária"> <span>Prática intermediária — Uso de todas as tecnologias.</span></label>
+            <label><input type="radio" name="p8_2_tecnologia" value="Melhor prática"> <span>Melhor prática — Uso de todas as tecnologias + avaliação de efetividade.</span></label>
+            <label><input type="radio" name="p8_2_tecnologia" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-9">
+        <h3>9. Fiscalização</h3>
+        <div class="pergunta" id="q9_num_agentes">
+          <h4>Número de agentes</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p9_1_agentes" value="Prática inicial"> <span>Prática inicial — ~1 agente para cada 3.000 a 4.000 veículos.</span></label>
+            <label><input type="radio" name="p9_1_agentes" value="Prática intermediária"> <span>Prática intermediária — ~1 agente para cada 2.000 a 3.000 veículos.</span></label>
+            <label><input type="radio" name="p9_1_agentes" value="Melhor prática"> <span>Melhor prática — ~1 agente para cada 1.000 a 2.000 veículos.</span></label>
+            <label><input type="radio" name="p9_1_agentes" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q9_treinamento">
+          <h4>Programas de treinamento de agentes</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p9_2_treinamento" value="Prática inicial"> <span>Prática inicial — Treinamento conforme legislação, mas sem alcançar a totalidade.</span></label>
+            <label><input type="radio" name="p9_2_treinamento" value="Prática intermediária"> <span>Prática intermediária — Treinamento para a totalidade dos agentes.</span></label>
+            <label><input type="radio" name="p9_2_treinamento" value="Melhor prática"> <span>Melhor prática — Treinamento para a totalidade + reciclagens periódicas.</span></label>
+            <label><input type="radio" name="p9_2_treinamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q9_politica">
+          <h4>Política de fiscalização (baseada em dados e locais críticos)</h4>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p9_3_politica" value="Prática inicial"> <span>Prática inicial — Estratégia definida, mas não baseada em dados estatísticos.</span></label>
+            <label><input type="radio" name="p9_3_politica" value="Prática intermediária"> <span>Prática intermediária — Estratégia baseada em dados estatísticos.</span></label>
+            <label><input type="radio" name="p9_3_politica" value="Melhor prática"> <span>Melhor prática — Estratégia baseada em dados, com acompanhamento e avaliação de efetividade.</span></label>
+            <label><input type="radio" name="p9_3_politica" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q9_inovacoes">
+          <h4>Inovações em fiscalização</h4>
+          <p class="hint">Radar móvel, fixo, estático e portátil.</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p9_4_inovacoes" value="Prática inicial"> <span>Prática inicial — Uso de 1 ou 2 dispositivos.</span></label>
+            <label><input type="radio" name="p9_4_inovacoes" value="Prática intermediária"> <span>Prática intermediária — Uso de 3 ou 4 dispositivos.</span></label>
+            <label><input type="radio" name="p9_4_inovacoes" value="Melhor prática"> <span>Melhor prática — Uso de 3 ou 4 dispositivos com avaliação de efetividade.</span></label>
+            <label><input type="radio" name="p9_4_inovacoes" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="categoria-passo" id="categoria-10">
+        <h3>10. Regulamentações Adicionais</h3>
+        <div class="pergunta" id="q10_regulamentacoes">
+          <h4>Existência de regulamentações adicionais</h4>
+          <p class="hint">Tração animal, fretamento, mototáxi/motofrete e transporte escolar.</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p10_1_regs" value="Prática inicial"> <span>Prática inicial — Legislação específica para apenas 1 dos casos.</span></label>
+            <label><input type="radio" name="p10_1_regs" value="Prática intermediária"> <span>Prática intermediária — Legislação específica para 2 ou 3 dos casos.</span></label>
+            <label><input type="radio" name="p10_1_regs" value="Melhor prática"> <span>Melhor prática — Legislação específica para todos os casos.</span></label>
+            <label><input type="radio" name="p10_1_regs" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+        <div class="pergunta" id="q10_vistoria">
+          <h4>Vistoria</h4>
+          <p class="hint">Previsão de vistoria para tração animal, fretamento, mototáxi/motofrete e transporte escolar.</p>
+          <div class="opcoes-resposta">
+            <label><input type="radio" name="p10_2_vistoria" value="Prática inicial"> <span>Prática inicial — Previsão para apenas 1 dos casos.</span></label>
+            <label><input type="radio" name="p10_2_vistoria" value="Prática intermediária"> <span>Prática intermediária — Previsão para 2 ou 3 dos casos.</span></label>
+            <label><input type="radio" name="p10_2_vistoria" value="Melhor prática"> <span>Melhor prática — Previsão para todos os casos.</span></label>
+            <label><input type="radio" name="p10_2_vistoria" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="navegacao-botoes">
+        <button type="button" class="btn" id="btn-anterior">Anterior</button>
+        <button type="button" class="btn" id="btn-proximo">Próximo</button>
+      </div>
+    </form>
+  </div>
+  <div id="diagnostico-container" style="display: none;">
+    <div class="diagnostico-header">
+      <h2>Diagnóstico de Segurança Viária</h2>
+      <p>Este relatório apresenta o desempenho do município com base nas respostas fornecidas.</p>
+    </div>
+    <div class="diagnostico-section">
+      <h3>Gráfico de Avaliação Geral (Desempenho Médio dos Domínios)</h3>
+      <div id="radar-chart-container">
+          <canvas id="radar-chart"></canvas>
+      </div>
+    </div>
+    <div class="diagnostico-section">
+        <h3>Tabela de Desempenho</h3>
+        <div id="tabela-desempenho-container"></div>
+    </div>
+    <div class="diagnostico-section">
+      <h3>Análise Detalhada por Domínio</h3>
+      <div id="graficos-detalhados"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================================================= //
+//             LÓGICA DO QUESTIONÁRIO (PARTE 1)            //
+// ======================================================= //
+
+const form = document.getElementById('autoavaliacao-form');
+const btnAnterior = document.getElementById('btn-anterior');
+const btnProximo = document.getElementById('btn-proximo');
+const categoriaAtualEl = document.getElementById('categoria-atual');
+const categoriaTotalEl = document.getElementById('categoria-total');
+const todasAsCategorias = Array.from(document.querySelectorAll('.categoria-passo'));
+
+let passoAtual = 0;
+let categoriasVisiveis = [];
+let condicoesIniciaisProcessadas = false;
+
+function setVisivel(el, visivel) {
+  if (!el) return;
+  const radios = el.querySelectorAll('input[type="radio"]');
+  if (visivel) {
+    el.classList.remove('condHidden');
+    if (radios.length > 0) radios[0].setAttribute('required', 'required');
+  } else {
+    el.classList.add('condHidden');
+    radios.forEach(radio => {
+        radio.checked = false;
+        radio.removeAttribute('required');
+    });
+  }
+}
+
+function mostrarPasso(indice) {
+  todasAsCategorias.forEach(c => c.classList.remove('ativo'));
+  if (categoriasVisiveis[indice]) {
+    categoriasVisiveis[indice].classList.add('ativo');
+  }
+  categoriaAtualEl.textContent = indice + 1;
+  categoriaTotalEl.textContent = categoriasVisiveis.length;
+  btnAnterior.style.visibility = indice === 0 ? 'hidden' : 'visible';
+  btnProximo.textContent = indice === categoriasVisiveis.length - 1 ? 'Finalizar e Gerar Diagnóstico' : 'Próximo';
+}
+
+function validarCategoria(elCategoria) {
+  const perguntas = Array.from(elCategoria.querySelectorAll('.pergunta')).filter(p => !p.classList.contains('condHidden'));
+  for (const perg of perguntas) {
+    const radios = Array.from(perg.querySelectorAll('input[type="radio"]'));
+    if (radios.length > 0 && radios[0].hasAttribute('required')) {
+      if (!radios.some(r => r.checked)) return false;
+    }
+  }
+  return true;
+}
+
+function coletarRespostas() {
+  const marcados = form.querySelectorAll('input[type="radio"]:checked');
+  const respostas = {};
+  marcados.forEach(inp => respostas[inp.name] = inp.value);
+  return respostas;
+}
+
+function processarRespostasIniciaisEFiltrarCategorias() {
+  const popRegiaoInput = document.querySelector('input[name="p1_1_pop_regiao"]:checked');
+  const municipalizadoInput = document.querySelector('input[name="p1_2_municipalizado"]:checked');
+  if (!popRegiaoInput || !municipalizadoInput) return false;
+
+  const [regiaoStr, popStr] = popRegiaoInput.value.split('|');
+  const regiao_metropolitana = (regiaoStr === 'regiao_true');
+  const transito_municipalizado = (municipalizadoInput.value === 'true');
+  const pop_ate_20k = popStr === 'pop_20k';
+  const pop_20a500k = popStr === 'pop_500k';
+  const pop_acima_500k = popStr === 'pop_over_500k';
+
+  categoriasVisiveis = [document.getElementById('categoria-1')];
+
+  const cat2 = document.getElementById('categoria-2');
+  if (!pop_ate_20k) {
+      categoriasVisiveis.push(cat2);
+      setVisivel(document.getElementById('q2_plano_diretor'), true);
+      setVisivel(document.getElementById('q2_plano_mobilidade'), true);
+      setVisivel(document.getElementById('q2_compatibilizacao'), true);
+      setVisivel(document.getElementById('q2_ptui'), pop_acima_500k);
+      setVisivel(document.getElementById('q2_pdui'), regiao_metropolitana && (pop_20a500k || pop_acima_500k));
+  } else {
+      cat2.querySelectorAll('.pergunta').forEach(p => setVisivel(p, false));
+  }
+  
+  const cat3 = document.getElementById('categoria-3');
+  if (transito_municipalizado) {
+      categoriasVisiveis.push(cat3);
+      cat3.querySelectorAll('.pergunta').forEach(p => setVisivel(p, true));
+  } else {
+      cat3.querySelectorAll('.pergunta').forEach(p => setVisivel(p, false));
+  }
+
+  for (let i = 4; i <= 10; i++) {
+      const cat = document.getElementById(`categoria-${i}`);
+      if(cat) {
+        categoriasVisiveis.push(cat);
+        cat.querySelectorAll('.pergunta').forEach(p => {
+          if (p.id !== 'q8_tecnologia') setVisivel(p, true);
+        });
+      }
+  }
+
+  condicoesIniciaisProcessadas = true;
+  passoAtual = 1;
+  mostrarPasso(passoAtual);
+  aplicarCondicaoCategoria8();
+  return true;
+}
+
+function aplicarCondicaoCategoria8() {
+  const resp8_1 = document.querySelector('input[name="p8_1_estrategias"]:checked');
+  const bloco8_2 = document.getElementById('q8_tecnologia');
+  setVisivel(bloco8_2, resp8_1 && resp8_1.value !== 'Sem práticas relacionadas no município');
+}
+
+btnProximo.addEventListener('click', () => {
+  if (!condicoesIniciaisProcessadas) {
+    if (!validarCategoria(document.getElementById('categoria-1'))) {
+      alert('Por favor, responda a todas as perguntas para continuar.');
+      return;
+    }
+    if (!processarRespostasIniciaisEFiltrarCategorias()) return;
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+    return;
+  }
+
+  const catAtualEl = categoriasVisiveis[passoAtual];
+  if (!validarCategoria(catAtualEl)) {
+    alert('Responda todas as perguntas obrigatórias desta categoria antes de continuar.');
+    return;
+  }
+
+  if (passoAtual < categoriasVisiveis.length - 1) {
+    passoAtual++;
+    mostrarPasso(passoAtual);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+  } else {
+    const respostasFinais = coletarRespostas();
+    document.getElementById('questionario-wrapper').style.display = 'none';
+    document.getElementById('diagnostico-container').style.display = 'block';
+    
+    gerarDiagnosticoCompleto(respostasFinais);
+  }
+});
+
+btnAnterior.addEventListener('click', () => {
+  if (passoAtual > 0) {
+    passoAtual--;
+    mostrarPasso(passoAtual);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+    if (categoriasVisiveis[passoAtual].id === 'categoria-1') {
+      condicoesIniciaisProcessadas = false;
+      categoriaAtualEl.textContent = 1;
+      categoriaTotalEl.textContent = 10;
+    }
+  }
+});
+
+document.querySelectorAll('input[name="p8_1_estrategias"]').forEach(r => {
+  r.addEventListener('change', aplicarCondicaoCategoria8);
+});
+
+(function inicializar() {
+  categoriasVisiveis = [document.getElementById('categoria-1')];
+  todasAsCategorias.forEach(cat => cat.classList.remove('ativo'));
+  categoriasVisiveis[0].classList.add('ativo');
+  categoriaAtualEl.textContent = 1;
+  categoriaTotalEl.textContent = 10;
+  btnAnterior.style.visibility = 'hidden';
+  todasAsCategorias.forEach(cat => {
+    if (cat.id !== 'categoria-1') {
+        cat.querySelectorAll('.pergunta').forEach(p => setVisivel(p, false));
+    }
+  });
+})();
+
+// ======================================================= //
+//              LÓGICA DO DIAGNÓSTICO (PARTE 2)            //
+// ======================================================= //
+
+const STATUS_COLORS = {
+    ausencia: '#dc3545',
+    inicial: '#ffc107',
+    intermediaria: '#17a2b8',
+    avancada: '#28a745'
+};
+
+const PONTUACAO_MAP = {
+  "Sem práticas relacionadas no município": { score: 0,  color: STATUS_COLORS.ausencia, label: 'Ausência' },
+  "Prática inicial":                       { score: 33, color: STATUS_COLORS.inicial, label: 'Inicial' },
+  "Prática intermediária":                 { score: 67, color: STATUS_COLORS.intermediaria, label: 'Intermediária' },
+  "Melhor prática":                        { score: 100,color: STATUS_COLORS.avancada, label: 'Avançada' }
+};
+
+const ESTRUTURA_DIAGNOSTICO = [
+  { domain: 'Legislação Urbanística', subdomains: [ { id: 'p2_1_plano_diretor', name: 'Plano Diretor' }, { id: 'p2_2_plano_mobilidade', name: 'Plano de Mobilidade' }, { id: 'p2_3_compatibilizacao', name: 'Compatibilização' }, { id: 'p2_4_ptui', name: 'Plano de Transporte Urbano Integrado' }, { id: 'p2_5_pdui', name: 'Plano de Desenvolvimento Urbano Integrado' } ] },
+  { domain: 'Elementos da Municipalização', subdomains: [ { id: 'p3_1_snt', name: 'Integração ao SNT' }, { id: 'p3_2_engenharia', name: 'Área de engenharia' }, { id: 'p3_3_fiscalizacao', name: 'Área de fiscalização' }, { id: 'p3_4_educacao', name: 'Área de educação' }, { id: 'p3_5_multas', name: 'Recurso das multas' } ] },
+  { domain: 'Transporte Não Motorizado - A Pé', subdomains: [ { id: 'p4_4_calcadas', name: 'Manutenção de calçadas' }, { id: 'p4_5_pcd', name: 'Adequação para PCD' }, { id: 'p4_6_seg_pub', name: 'Segurança para pedestres' } ] },
+  { domain: 'Transporte Não Motorizado - Bicicleta', subdomains: [ { id: 'p4_1_planejamento', name: 'Planejamento cicloviário' }, { id: 'p4_2_expansao', name: 'Expansão da rede' }, { id: 'p4_3_estacionamento', name: 'Estacionamento' } ] },
+  { domain: 'Monitoramento', subdomains: [ { id: 'p5_1_estatistica', name: 'Estatística de acidentes' }, { id: 'p5_2_planejamento', name: 'Planejamento e monitoramento' } ] },
+  { domain: 'Gestão da Velocidade', subdomains: [ { id: 'p6_1_controle', name: 'Controle eletrônico' }, { id: 'p6_2_medidas', name: 'Medidas físicas' } ] },
+  { domain: 'Educação para o Trânsito', subdomains: [ { id: 'p7_1_escolas', name: 'Ações em escolas' }, { id: 'p7_2_sociedade', name: 'Ações para a sociedade' } ] },
+  { domain: 'Controle de Tráfego', subdomains: [ { id: 'p8_1_estrategias', name: 'Estratégias de controle' }, { id: 'p8_2_tecnologia', name: 'Tecnologia semafórica' } ] },
+  { domain: 'Fiscalização', subdomains: [ { id: 'p9_1_agentes', name: 'Número de agentes' }, { id: 'p9_2_treinamento', name: 'Treinamento de agentes' }, { id: 'p9_3_politica', name: 'Política de fiscalização' }, { id: 'p9_4_inovacoes', name: 'Inovações' } ] },
+  { domain: 'Regulamentações Adicionais', subdomains: [ { id: 'p10_1_regs', name: 'Regulamentações' }, { id: 'p10_2_vistoria', name: 'Vistoria' } ] }
+];
+
+// Função principal do diagnóstico CORRIGIDA com setTimeout
+function gerarDiagnosticoCompleto(respostas) {
+    // Rola a tela para o topo da seção de diagnóstico
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const resultadosProcessados = processarResultados(respostas);
+    
+    // Renderiza a tabela primeiro, pois não depende de canvas
+    renderizarTabelaDesempenho(resultadosProcessados);
+
+    // CORREÇÃO: Adiciona um pequeno atraso para renderizar os gráficos
+    // Isso garante que o container estará visível e com as dimensões corretas
+    setTimeout(() => {
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = 'Inter', 'sans-serif';
+        Chart.defaults.color = 'var(--text-dark)';
+        Chart.defaults.borderColor = 'var(--border-color)';
+
+        renderizarGraficoRadar(resultadosProcessados);
+        renderizarGraficosDeBarra(resultadosProcessados);
+    }, 150); // 150 milissegundos de atraso
+}
+
+function processarResultados(respostas) {
+    return ESTRUTURA_DIAGNOSTICO.map(dominio => {
+        let totalScore = 0, count = 0;
+        const subdomainsComResultados = dominio.subdomains.map(sub => {
+            const resposta = respostas[sub.id];
+            if (resposta && PONTUACAO_MAP[resposta]) {
+                const resultado = PONTUACAO_MAP[resposta];
+                totalScore += resultado.score;
+                count++;
+                return { ...sub, ...resultado };
+            }
+            return null; 
+        }).filter(Boolean);
+
+        return {
+            domain: dominio.domain,
+            averageScore: count > 0 ? parseFloat((totalScore / count).toFixed(1)) : 0,
+            subdomains: subdomainsComResultados
+        };
+    }).filter(d => d.subdomains.length > 0);
+}
+
+function renderizarGraficoRadar(resultados) {
+    const ctx = document.getElementById('radar-chart').getContext('2d');
+    if (window.radarChartInstance) window.radarChartInstance.destroy();
+
+    window.radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: resultados.map(d => d.domain.split(' - ')),
+            datasets: [{
+                label: 'Desempenho Médio (%)',
+                data: resultados.map(d => d.averageScore),
+                fill: true,
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderColor: 'var(--primary-color)',
+                pointBackgroundColor: 'var(--primary-color)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'var(--primary-color)'
+            }]
+        },
+        options: {
+            elements: { line: { borderWidth: 2 }, point: { radius: 4, hoverRadius: 6, borderWidth: 2 } },
+            scales: {
+                r: {
+                    angleLines: { color: 'var(--border-color)' },
+                    grid: { color: 'var(--border-color)' },
+                    suggestedMin: 0,
+                    suggestedMax: 100,
+                    pointLabels: { font: { size: 13, weight: '500' }, color: 'var(--text-dark)' },
+                    ticks: {
+                        backdropColor: 'var(--background-white)',
+                        color: 'var(--text-muted)',
+                        stepSize: 25,
+                        callback: value => value + '%'
+                    }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { callbacks: { label: context => `${context.dataset.label}: ${context.raw}%` } }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderizarTabelaDesempenho(resultados) {
+    const container = document.getElementById('tabela-desempenho-container');
+    container.innerHTML = '';
+    resultados.forEach(dominio => {
+        const dominioGrupo = document.createElement('div');
+        dominioGrupo.className = 'dominio-grupo';
+        const titulo = document.createElement('h4');
+        titulo.textContent = dominio.domain;
+        dominioGrupo.appendChild(titulo);
+        dominio.subdomains.forEach(sub => {
+            const item = document.createElement('div');
+            item.className = 'subdominio-item';
+            const nome = document.createElement('span');
+            nome.textContent = sub.name;
+            const desempenho = document.createElement('div');
+            desempenho.className = 'cor-desempenho';
+            desempenho.textContent = sub.label;
+            desempenho.setAttribute('data-label', sub.label);
+            item.appendChild(nome);
+            item.appendChild(desempenho);
+            dominioGrupo.appendChild(item);
+        });
+        container.appendChild(dominioGrupo);
+    });
+}
+
+function renderizarGraficosDeBarra(resultados) {
+    const container = document.getElementById('graficos-detalhados');
+    container.innerHTML = '';
+
+    if (window.barChartInstances) window.barChartInstances.forEach(chart => chart.destroy());
+    window.barChartInstances = [];
+
+    resultados.forEach((dominio) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'grafico-barra-container';
+        const titulo = document.createElement('h4');
+        titulo.textContent = dominio.domain;
+        const canvasContainer = document.createElement('div');
+        canvasContainer.style.position = 'relative';
+        canvasContainer.style.height = `${dominio.subdomains.length * 40 + 30}px`;
+        const canvas = document.createElement('canvas');
+        canvasContainer.appendChild(canvas)
+        wrapper.appendChild(titulo);
+        wrapper.appendChild(canvasContainer);
+        container.appendChild(wrapper);
+
+        const chartInstance = new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: dominio.subdomains.map(s => s.name),
+                datasets: [{
+                    label: 'Desempenho',
+                    data: dominio.subdomains.map(s => s.score),
+                    backgroundColor: dominio.subdomains.map(s => s.color)
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { drawOnChartArea: false } },
+                    y: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        formatter: (value) => value + '%',
+                        color: 'var(--text-dark)',
+                        font: { weight: '500', size: 13 }
+                    }
+                }
+            }
+        });
+        window.barChartInstances.push(chartInstance);
+    });
+}
+</script>
+</body>
+</html>
