@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Questionário e Diagnóstico de Segurança Viária - ONSV</title>
   
+  <!-- Chart.js para os gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Plugin para exibir os rótulos de dados nos gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* O CSS permanece o mesmo da versão anterior */
+    /* O CSS permanece o mesmo da versão anterior, com uma adição para "Não se aplica" */
     :root {
       --primary-color: #007bff;
       --secondary-color: #6c757d;
@@ -24,10 +26,11 @@
       --border-radius-lg: 12px;
       --border-radius-md: 8px;
       --box-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
-      --status-ausencia: #dc3545;
-      --status-inicial: #ffc107;
-      --status-intermediaria: #17a2b8;
-      --status-avancada: #28a745;
+      --status-ausencia: #dc3545; /* Vermelho */
+      --status-inicial: #fd7e14; /* Laranja */
+      --status-intermediaria: #007bff; /* Azul */
+      --status-avancada: #28a745; /* Verde */
+      --status-nao-aplica: #6c757d; /* Cinza */
     }
     html {
         scroll-behavior: smooth; /* Habilita a rolagem suave */
@@ -218,9 +221,10 @@
     
     #radar-chart-container {
         position: relative;
-        height: 50vh;
-        min-height: 450px;
+        height: 500px; /* Alterado de 50vh para um valor fixo para garantir a renderização */
         width: 100%;
+        max-width: 600px; /* Adicionado para melhor visualização em telas largas */
+        margin: 0 auto; /* Adicionado para centralizar o gráfico */
     }
 
     #tabela-desempenho-container {
@@ -355,6 +359,8 @@
           </div>
         </div>
       </div>
+      
+      <!-- As perguntas permanecem as mesmas, mas adicionei a opção "Não se aplica" -->
       <div class="categoria-passo" id="categoria-2">
         <h3>2. Legislação Urbanística</h3>
         <div class="pergunta" id="q2_plano_diretor">
@@ -365,6 +371,7 @@
             <label><input type="radio" name="p2_1_plano_diretor" value="Prática intermediária"> <span>Prática intermediária — O município elaborou seu Plano Diretor fora do prazo previsto.</span></label>
             <label><input type="radio" name="p2_1_plano_diretor" value="Melhor prática"> <span>Melhor prática — O município elaborou seu Plano Diretor no prazo previsto.</span></label>
             <label><input type="radio" name="p2_1_plano_diretor" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p2_1_plano_diretor" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q2_plano_mobilidade">
@@ -375,6 +382,7 @@
             <label><input type="radio" name="p2_2_plano_mobilidade" value="Prática intermediária"> <span>Prática intermediária — O município elaborou seu Plano de Mobilidade fora do prazo previsto.</span></label>
             <label><input type="radio" name="p2_2_plano_mobilidade" value="Melhor prática"> <span>Melhor prática — O município elaborou seu Plano de Mobilidade no prazo previsto.</span></label>
             <label><input type="radio" name="p2_2_plano_mobilidade" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p2_2_plano_mobilidade" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q2_compatibilizacao">
@@ -385,6 +393,7 @@
             <label><input type="radio" name="p2_3_compatibilizacao" value="Prática intermediária"> <span>Prática intermediária — Instrumentos elaborados e em processo de compatibilização.</span></label>
             <label><input type="radio" name="p2_3_compatibilizacao" value="Melhor prática"> <span>Melhor prática — Houve compatibilização de todos os instrumentos.</span></label>
             <label><input type="radio" name="p2_3_compatibilizacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p2_3_compatibilizacao" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q2_ptui">
@@ -395,6 +404,7 @@
                 <label><input type="radio" name="p2_4_ptui" value="Prática intermediária"> <span>Prática intermediária — Elaborado fora do prazo.</span></label>
                 <label><input type="radio" name="p2_4_ptui" value="Melhor prática"> <span>Melhor prática — Elaborado no prazo previsto.</span></label>
                 <label><input type="radio" name="p2_4_ptui" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p2_4_ptui" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
         <div class="pergunta" id="q2_pdui">
@@ -405,6 +415,7 @@
                 <label><input type="radio" name="p2_5_pdui" value="Prática intermediária"> <span>Prática intermediária — PDUI concluído, porém com dificuldades de planejamento integrado.</span></label>
                 <label><input type="radio" name="p2_5_pdui" value="Melhor prática"> <span>Melhor prática — PDUI concluído e poucas dificuldades para o planejamento integrado.</span></label>
                 <label><input type="radio" name="p2_5_pdui" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p2_5_pdui" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
       </div>
@@ -418,6 +429,7 @@
                 <label><input type="radio" name="p3_1_snt" value="Prática intermediária"> <span>Prática intermediária — Municipalização concluída, porém com dificuldades nas ações de engenharia, fiscalização e educação.</span></label>
                 <label><input type="radio" name="p3_1_snt" value="Melhor prática"> <span>Melhor prática — Municipalização plenamente concluída, com ações efetivas de engenharia, fiscalização e educação.</span></label>
                 <label><input type="radio" name="p3_1_snt" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p3_1_snt" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
         <div class="pergunta" id="q3_engenharia">
@@ -427,6 +439,7 @@
                 <label><input type="radio" name="p3_2_engenharia" value="Prática intermediária"> <span>Prática intermediária — Há equipe pouco estruturada.</span></label>
                 <label><input type="radio" name="p3_2_engenharia" value="Melhor prática"> <span>Melhor prática — Há equipe habilitada responsável por estudos e intervenções.</span></label>
                 <label><input type="radio" name="p3_2_engenharia" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p3_2_engenharia" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
         <div class="pergunta" id="q3_fiscalizacao">
@@ -436,6 +449,7 @@
                 <label><input type="radio" name="p3_3_fiscalizacao" value="Prática intermediária"> <span>Prática intermediária — Há equipe, porém com dificuldades operacionais.</span></label>
                 <label><input type="radio" name="p3_3_fiscalizacao" value="Melhor prática"> <span>Melhor prática — Há equipe fixa com atuação continuada.</span></label>
                 <label><input type="radio" name="p3_3_fiscalizacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p3_3_fiscalizacao" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
         <div class="pergunta" id="q3_educacao">
@@ -445,6 +459,7 @@
                 <label><input type="radio" name="p3_4_educacao" value="Prática intermediária"> <span>Prática intermediária — Ações continuadas com planejamento, sem Escola Pública de Trânsito.</span></label>
                 <label><input type="radio" name="p3_4_educacao" value="Melhor prática"> <span>Melhor prática — Ações continuadas com planejamento e Escola Pública de Trânsito atuante.</span></label>
                 <label><input type="radio" name="p3_4_educacao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p3_4_educacao" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
         <div class="pergunta" id="q3_multas">
@@ -454,6 +469,7 @@
                 <label><input type="radio" name="p3_5_multas" value="Prática intermediária"> <span>Prática intermediária — Apesar da JARI, há dificuldades para aplicação dos recursos.</span></label>
                 <label><input type="radio" name="p3_5_multas" value="Melhor prática"> <span>Melhor prática — Há JARI e os recursos das multas são aplicados em projetos de trânsito.</span></label>
                 <label><input type="radio" name="p3_5_multas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+                <label><input type="radio" name="p3_5_multas" value="Não se aplica"> <span>Não se aplica.</span></label>
             </div>
         </div>
       </div>
@@ -466,6 +482,7 @@
             <label><input type="radio" name="p4_1_planejamento" value="Prática intermediária"> <span>Prática intermediária — Plano cicloviário com metas de expansão da infraestrutura.</span></label>
             <label><input type="radio" name="p4_1_planejamento" value="Melhor prática"> <span>Melhor prática — Plano cicloviário com metas integrado ao sistema de transporte urbano e controle de estatísticas de ciclistas/acidentes.</span></label>
             <label><input type="radio" name="p4_1_planejamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_1_planejamento" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q4_expansao_rede">
@@ -475,6 +492,7 @@
             <label><input type="radio" name="p4_2_expansao" value="Prática intermediária"> <span>Prática intermediária — Expansão ocasional, sem atender adequadamente à demanda.</span></label>
             <label><input type="radio" name="p4_2_expansao" value="Melhor prática"> <span>Melhor prática — Expansão frequente, sistema em crescimento contínuo.</span></label>
             <label><input type="radio" name="p4_2_expansao" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_2_expansao" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q4_estacionamento_bike">
@@ -484,6 +502,7 @@
             <label><input type="radio" name="p4_3_estacionamento" value="Prática intermediária"> <span>Prática intermediária — Disponível em alguns terminais e polos geradores.</span></label>
             <label><input type="radio" name="p4_3_estacionamento" value="Melhor prática"> <span>Melhor prática — Disponível nos principais terminais e prédios públicos, com legislação municipal para mínimos em privados.</span></label>
             <label><input type="radio" name="p4_3_estacionamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_3_estacionamento" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q4_calcadas_manutencao">
@@ -493,6 +512,7 @@
             <label><input type="radio" name="p4_4_calcadas" value="Prática intermediária"> <span>Prática intermediária — Plano de extensão com metas de expansão da infraestrutura.</span></label>
             <label><input type="radio" name="p4_4_calcadas" value="Melhor prática"> <span>Melhor prática — Plano com metas de expansão e melhoria + plano integrado de circulação de pedestres.</span></label>
             <label><input type="radio" name="p4_4_calcadas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_4_calcadas" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q4_pcd">
@@ -502,6 +522,7 @@
             <label><input type="radio" name="p4_5_pcd" value="Prática intermediária"> <span>Prática intermediária — Há um plano de adequação.</span></label>
             <label><input type="radio" name="p4_5_pcd" value="Melhor prática"> <span>Melhor prática — Plano com metas e controle de resultados, em expansão frequente.</span></label>
             <label><input type="radio" name="p4_5_pcd" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_5_pcd" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q4_seguranca_publica">
@@ -511,6 +532,7 @@
             <label><input type="radio" name="p4_6_seg_pub" value="Prática intermediária"> <span>Prática intermediária — Boa iluminação e presença de policiamento.</span></label>
             <label><input type="radio" name="p4_6_seg_pub" value="Melhor prática"> <span>Melhor prática — Boa iluminação + policiamento + controle estatístico de violência com ações mitigadoras.</span></label>
             <label><input type="radio" name="p4_6_seg_pub" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p4_6_seg_pub" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -523,6 +545,7 @@
             <label><input type="radio" name="p5_1_estatistica" value="Prática intermediária"> <span>Prática intermediária — Base única compatibilizada, porém sem complementação pós-acidente.</span></label>
             <label><input type="radio" name="p5_1_estatistica" value="Melhor prática"> <span>Melhor prática — Base única compatibilizada com complementação pós-acidente.</span></label>
             <label><input type="radio" name="p5_1_estatistica" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p5_1_estatistica" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q5_planejamento_monitoramento">
@@ -532,6 +555,7 @@
             <label><input type="radio" name="p5_2_planejamento" value="Prática intermediária"> <span>Prática intermediária — Estatísticas orientam e há monitoramento de efetividade.</span></label>
             <label><input type="radio" name="p5_2_planejamento" value="Melhor prática"> <span>Melhor prática — Estatísticas orientam, há monitoramento e decisões para disseminar/extinguir práticas.</span></label>
             <label><input type="radio" name="p5_2_planejamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p5_2_planejamento" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -544,6 +568,7 @@
             <label><input type="radio" name="p6_1_controle" value="Prática intermediária"> <span>Prática intermediária — Há dispositivos e implantação depende de análises técnicas formais.</span></label>
             <label><input type="radio" name="p6_1_controle" value="Melhor prática"> <span>Melhor prática — Há dispositivos + política formal de controle eletrônico no município.</span></label>
             <label><input type="radio" name="p6_1_controle" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p6_1_controle" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q6_medidas_fisicas">
@@ -553,6 +578,7 @@
             <label><input type="radio" name="p6_2_medidas" value="Prática intermediária"> <span>Prática intermediária — Ações isoladas de moderação de tráfego.</span></label>
             <label><input type="radio" name="p6_2_medidas" value="Melhor prática"> <span>Melhor prática — Política de moderação de tráfego (adequação de infraestrutura para reduzir velocidade).</span></label>
             <label><input type="radio" name="p6_2_medidas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p6_2_medidas" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -565,6 +591,7 @@
             <label><input type="radio" name="p7_1_escolas" value="Prática intermediária"> <span>Prática intermediária — Ações com atividades práticas/informativas, sem planejamento periódico.</span></label>
             <label><input type="radio" name="p7_1_escolas" value="Melhor prática"> <span>Melhor prática — Ações continuadas e frequentes, dentro de planejamento municipal periódico.</span></label>
             <label><input type="radio" name="p7_1_escolas" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p7_1_escolas" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q7_sociedade">
@@ -574,6 +601,7 @@
             <label><input type="radio" name="p7_2_sociedade" value="Prática intermediária"> <span>Prática intermediária — Ações com atividades práticas/informativas, sem planejamento periódico.</span></label>
             <label><input type="radio" name="p7_2_sociedade" value="Melhor prática"> <span>Melhor prática — Ações continuadas e frequentes, dentro de planejamento municipal periódico.</span></label>
             <label><input type="radio" name="p7_2_sociedade" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p7_2_sociedade" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -586,6 +614,7 @@
             <label><input type="radio" name="p8_1_estrategias" value="Prática intermediária"> <span>Prática intermediária — Semáforos e rotatórias são utilizados.</span></label>
             <label><input type="radio" name="p8_1_estrategias" value="Melhor prática"> <span>Melhor prática — Semáforos e rotatórias com avaliação de efetividade da implantação.</span></label>
             <label><input type="radio" name="p8_1_estrategias" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p8_1_estrategias" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q8_tecnologia">
@@ -596,6 +625,7 @@
             <label><input type="radio" name="p8_2_tecnologia" value="Prática intermediária"> <span>Prática intermediária — Uso de todas as tecnologias.</span></label>
             <label><input type="radio" name="p8_2_tecnologia" value="Melhor prática"> <span>Melhor prática — Uso de todas as tecnologias + avaliação de efetividade.</span></label>
             <label><input type="radio" name="p8_2_tecnologia" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p8_2_tecnologia" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -608,6 +638,7 @@
             <label><input type="radio" name="p9_1_agentes" value="Prática intermediária"> <span>Prática intermediária — ~1 agente para cada 2.000 a 3.000 veículos.</span></label>
             <label><input type="radio" name="p9_1_agentes" value="Melhor prática"> <span>Melhor prática — ~1 agente para cada 1.000 a 2.000 veículos.</span></label>
             <label><input type="radio" name="p9_1_agentes" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p9_1_agentes" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q9_treinamento">
@@ -617,6 +648,7 @@
             <label><input type="radio" name="p9_2_treinamento" value="Prática intermediária"> <span>Prática intermediária — Treinamento para a totalidade dos agentes.</span></label>
             <label><input type="radio" name="p9_2_treinamento" value="Melhor prática"> <span>Melhor prática — Treinamento para a totalidade + reciclagens periódicas.</span></label>
             <label><input type="radio" name="p9_2_treinamento" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p9_2_treinamento" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q9_politica">
@@ -626,6 +658,7 @@
             <label><input type="radio" name="p9_3_politica" value="Prática intermediária"> <span>Prática intermediária — Estratégia baseada em dados estatísticos.</span></label>
             <label><input type="radio" name="p9_3_politica" value="Melhor prática"> <span>Melhor prática — Estratégia baseada em dados, com acompanhamento e avaliação de efetividade.</span></label>
             <label><input type="radio" name="p9_3_politica" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p9_3_politica" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q9_inovacoes">
@@ -636,6 +669,7 @@
             <label><input type="radio" name="p9_4_inovacoes" value="Prática intermediária"> <span>Prática intermediária — Uso de 3 ou 4 dispositivos.</span></label>
             <label><input type="radio" name="p9_4_inovacoes" value="Melhor prática"> <span>Melhor prática — Uso de 3 ou 4 dispositivos com avaliação de efetividade.</span></label>
             <label><input type="radio" name="p9_4_inovacoes" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p9_4_inovacoes" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -649,6 +683,7 @@
             <label><input type="radio" name="p10_1_regs" value="Prática intermediária"> <span>Prática intermediária — Legislação específica para 2 ou 3 dos casos.</span></label>
             <label><input type="radio" name="p10_1_regs" value="Melhor prática"> <span>Melhor prática — Legislação específica para todos os casos.</span></label>
             <label><input type="radio" name="p10_1_regs" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p10_1_regs" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
         <div class="pergunta" id="q10_vistoria">
@@ -659,6 +694,7 @@
             <label><input type="radio" name="p10_2_vistoria" value="Prática intermediária"> <span>Prática intermediária — Previsão para 2 ou 3 dos casos.</span></label>
             <label><input type="radio" name="p10_2_vistoria" value="Melhor prática"> <span>Melhor prática — Previsão para todos os casos.</span></label>
             <label><input type="radio" name="p10_2_vistoria" value="Sem práticas relacionadas no município"> <span>Sem práticas relacionadas no município.</span></label>
+            <label><input type="radio" name="p10_2_vistoria" value="Não se aplica"> <span>Não se aplica.</span></label>
           </div>
         </div>
       </div>
@@ -692,8 +728,9 @@
 
 <script>
 // ======================================================= //
-//             LÓGICA DO QUESTIONÁRIO (PARTE 1)            //
+//                LÓGICA DO QUESTIONÁRIO (PARTE 1)         //
 // ======================================================= //
+// Esta parte do script permanece como você a criou.
 
 const form = document.getElementById('autoavaliacao-form');
 const btnAnterior = document.getElementById('btn-anterior');
@@ -814,7 +851,7 @@ btnProximo.addEventListener('click', () => {
       return;
     }
     if (!processarRespostasIniciaisEFiltrarCategorias()) return;
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
 
@@ -827,7 +864,7 @@ btnProximo.addEventListener('click', () => {
   if (passoAtual < categoriasVisiveis.length - 1) {
     passoAtual++;
     mostrarPasso(passoAtual);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } else {
     const respostasFinais = coletarRespostas();
     document.getElementById('questionario-wrapper').style.display = 'none';
@@ -841,7 +878,7 @@ btnAnterior.addEventListener('click', () => {
   if (passoAtual > 0) {
     passoAtual--;
     mostrarPasso(passoAtual);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // CORREÇÃO DO SCROLL
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (categoriasVisiveis[passoAtual].id === 'categoria-1') {
       condicoesIniciaisProcessadas = false;
       categoriaAtualEl.textContent = 1;
@@ -869,23 +906,22 @@ document.querySelectorAll('input[name="p8_1_estrategias"]').forEach(r => {
 })();
 
 // ======================================================= //
-//              LÓGICA DO DIAGNÓSTICO (PARTE 2)            //
+//                LÓGICA DO DIAGNÓSTICO (PARTE 2)          //
 // ======================================================= //
+// Esta seção foi REFEITA para corresponder aos requisitos.
 
-const STATUS_COLORS = {
-    ausencia: '#dc3545',
-    inicial: '#ffc107',
-    intermediaria: '#17a2b8',
-    avancada: '#28a745'
-};
-
+// Mapeamento de respostas para pontuações, cores e rótulos
 const PONTUACAO_MAP = {
-  "Sem práticas relacionadas no município": { score: 0,  color: STATUS_COLORS.ausencia, label: 'Ausência' },
-  "Prática inicial":                       { score: 33, color: STATUS_COLORS.inicial, label: 'Inicial' },
-  "Prática intermediária":                 { score: 67, color: STATUS_COLORS.intermediaria, label: 'Intermediária' },
-  "Melhor prática":                        { score: 100,color: STATUS_COLORS.avancada, label: 'Avançada' }
+  "Sem práticas relacionadas no município": { score: 0,   color: 'var(--status-ausencia)', label: 'Ausência' },
+  "Prática inicial":                     { score: 33,  color: 'var(--status-inicial)', label: 'Inicial' },
+  "Prática intermediária":                 { score: 67,  color: 'var(--status-intermediaria)', label: 'Intermediária' },
+  "Melhor prática":                      { score: 100, color: 'var(--status-avancada)', label: 'Avançada' }
 };
 
+// Objeto especial para a resposta "Não se aplica"
+const NAO_SE_APLICA_RESULT = { score: -1, color: 'var(--status-nao-aplica)', label: 'Não se aplica' };
+
+// Estrutura que conecta os IDs das perguntas aos domínios/subdomínios
 const ESTRUTURA_DIAGNOSTICO = [
   { domain: 'Legislação Urbanística', subdomains: [ { id: 'p2_1_plano_diretor', name: 'Plano Diretor' }, { id: 'p2_2_plano_mobilidade', name: 'Plano de Mobilidade' }, { id: 'p2_3_compatibilizacao', name: 'Compatibilização' }, { id: 'p2_4_ptui', name: 'Plano de Transporte Urbano Integrado' }, { id: 'p2_5_pdui', name: 'Plano de Desenvolvimento Urbano Integrado' } ] },
   { domain: 'Elementos da Municipalização', subdomains: [ { id: 'p3_1_snt', name: 'Integração ao SNT' }, { id: 'p3_2_engenharia', name: 'Área de engenharia' }, { id: 'p3_3_fiscalizacao', name: 'Área de fiscalização' }, { id: 'p3_4_educacao', name: 'Área de educação' }, { id: 'p3_5_multas', name: 'Recurso das multas' } ] },
@@ -899,18 +935,16 @@ const ESTRUTURA_DIAGNOSTICO = [
   { domain: 'Regulamentações Adicionais', subdomains: [ { id: 'p10_1_regs', name: 'Regulamentações' }, { id: 'p10_2_vistoria', name: 'Vistoria' } ] }
 ];
 
-// Função principal do diagnóstico CORRIGIDA com setTimeout
+// Função principal que organiza a geração do diagnóstico
 function gerarDiagnosticoCompleto(respostas) {
-    // Rola a tela para o topo da seção de diagnóstico
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const resultadosProcessados = processarResultados(respostas);
     
-    // Renderiza a tabela primeiro, pois não depende de canvas
+    // Renderiza a tabela primeiro, pois é mais rápida
     renderizarTabelaDesempenho(resultadosProcessados);
 
-    // CORREÇÃO: Adiciona um pequeno atraso para renderizar os gráficos
-    // Isso garante que o container estará visível e com as dimensões corretas
+    // Adiciona um pequeno atraso para os gráficos para garantir que o contêiner esteja visível
     setTimeout(() => {
         Chart.register(ChartDataLabels);
         Chart.defaults.font.family = 'Inter', 'sans-serif';
@@ -919,71 +953,138 @@ function gerarDiagnosticoCompleto(respostas) {
 
         renderizarGraficoRadar(resultadosProcessados);
         renderizarGraficosDeBarra(resultadosProcessados);
-    }, 150); // 150 milissegundos de atraso
+    }, 150);
 }
 
+// Processa as respostas brutas, calcula médias e formata os dados para os gráficos
 function processarResultados(respostas) {
     return ESTRUTURA_DIAGNOSTICO.map(dominio => {
         let totalScore = 0, count = 0;
         const subdomainsComResultados = dominio.subdomains.map(sub => {
             const resposta = respostas[sub.id];
-            if (resposta && PONTUACAO_MAP[resposta]) {
+            if (!resposta) return null; // Pergunta não foi respondida ou estava oculta
+
+            if (resposta === "Não se aplica") {
+                return { ...sub, ...NAO_SE_APLICA_RESULT };
+            }
+            
+            if (PONTUACAO_MAP[resposta]) {
                 const resultado = PONTUACAO_MAP[resposta];
-                totalScore += resultado.score;
+                totalScore += resultado.score; // Adiciona à pontuação para cálculo da média
                 count++;
                 return { ...sub, ...resultado };
             }
-            return null; 
-        }).filter(Boolean);
+            return null;
+        }).filter(Boolean); // Remove nulos
 
         return {
             domain: dominio.domain,
+            // Calcula a média do domínio, ignorando "Não se aplica"
             averageScore: count > 0 ? parseFloat((totalScore / count).toFixed(1)) : 0,
             subdomains: subdomainsComResultados
         };
-    }).filter(d => d.subdomains.length > 0);
+    }).filter(d => d.subdomains.length > 0); // Filtra domínios que não tiveram nenhuma resposta
 }
 
+// Gera o gráfico de radar com o desempenho médio por domínio (FUNÇÃO ATUALIZADA)
 function renderizarGraficoRadar(resultados) {
+    // CORREÇÃO: Recria o elemento canvas para evitar bugs de renderização na interação.
+    const container = document.getElementById('radar-chart-container');
+    container.innerHTML = '<canvas id="radar-chart"></canvas>';
     const ctx = document.getElementById('radar-chart').getContext('2d');
-    if (window.radarChartInstance) window.radarChartInstance.destroy();
+    
+    if (window.radarChartInstance) {
+        window.radarChartInstance.destroy();
+    }
+
+    // CORREÇÃO DE ESTILO: Lê as cores do CSS para garantir que sejam aplicadas corretamente.
+    const styles = getComputedStyle(document.documentElement);
+    const primaryColor = styles.getPropertyValue('--primary-color').trim() || '#007bff';
+    const textDarkColor = styles.getPropertyValue('--text-dark').trim() || '#343a40';
+    const textMutedColor = styles.getPropertyValue('--text-muted').trim() || '#868e96';
+    const backgroundColor = styles.getPropertyValue('--background-white').trim() || '#ffffff';
+    const gridColor = 'rgba(0, 0, 0, 0.1)';
+
+    // Função auxiliar para quebrar textos longos em múltiplas linhas, evitando sobreposição
+    function wrapText(text, maxWidth = 15) {
+        const words = text.split(' ');
+        let lines = [];
+        let currentLine = words[0] || '';
+
+        for (let i = 1; i < words.length; i++) {
+            if ((currentLine + ' ' + words[i]).length > maxWidth) {
+                lines.push(currentLine);
+                currentLine = words[i];
+            } else {
+                currentLine += ' ' + words[i];
+            }
+        }
+        lines.push(currentLine);
+        return lines;
+    }
 
     window.radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: resultados.map(d => d.domain.split(' - ')),
+            labels: resultados.map(d => wrapText(d.domain)), // Usa a função para quebrar o texto dos domínios
             datasets: [{
                 label: 'Desempenho Médio (%)',
                 data: resultados.map(d => d.averageScore),
                 fill: true,
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: 'var(--primary-color)',
-                pointBackgroundColor: 'var(--primary-color)',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)', // Usa cor fixa para consistência
+                borderColor: primaryColor,
+                borderWidth: 2.5,
+                pointBackgroundColor: primaryColor,
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'var(--primary-color)'
+                pointHoverBorderColor: primaryColor,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
-            elements: { line: { borderWidth: 2 }, point: { radius: 4, hoverRadius: 6, borderWidth: 2 } },
+            elements: {
+                line: {
+                    tension: 0.1
+                }
+            },
             scales: {
                 r: {
-                    angleLines: { color: 'var(--border-color)' },
-                    grid: { color: 'var(--border-color)' },
+                    angleLines: { color: gridColor },
+                    grid: { color: gridColor },
                     suggestedMin: 0,
                     suggestedMax: 100,
-                    pointLabels: { font: { size: 13, weight: '500' }, color: 'var(--text-dark)' },
+                    pointLabels: {
+                        font: { size: 12, weight: '600' },
+                        color: textDarkColor
+                    },
                     ticks: {
-                        backdropColor: 'var(--background-white)',
-                        color: 'var(--text-muted)',
+                        backdropColor: backgroundColor,
+                        color: textMutedColor,
                         stepSize: 25,
+                        backdropPadding: 4,
+                        font: { weight: '500' },
                         callback: value => value + '%'
                     }
                 }
             },
             plugins: {
-                legend: { position: 'top' },
-                tooltip: { callbacks: { label: context => `${context.dataset.label}: ${context.raw}%` } }
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: 14, weight: '500' }
+                    }
+                },
+                tooltip: { 
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 4,
+                    callbacks: {
+                        label: context => ` Desempenho: ${context.raw.toFixed(1)}%`
+                    }
+                }
             },
             responsive: true,
             maintainAspectRatio: false
@@ -991,6 +1092,8 @@ function renderizarGraficoRadar(resultados) {
     });
 }
 
+
+// Gera a tabela de desempenho com as cores correspondentes
 function renderizarTabelaDesempenho(resultados) {
     const container = document.getElementById('tabela-desempenho-container');
     container.innerHTML = '';
@@ -1017,6 +1120,7 @@ function renderizarTabelaDesempenho(resultados) {
     });
 }
 
+// Gera os gráficos de barras detalhados para cada domínio
 function renderizarGraficosDeBarra(resultados) {
     const container = document.getElementById('graficos-detalhados');
     container.innerHTML = '';
@@ -1037,6 +1141,9 @@ function renderizarGraficosDeBarra(resultados) {
         wrapper.appendChild(titulo);
         wrapper.appendChild(canvasContainer);
         container.appendChild(wrapper);
+        
+        // Armazena as pontuações originais para usar no rótulo
+        const originalScores = dominio.subdomains.map(s => s.score);
 
         const chartInstance = new Chart(canvas.getContext('2d'), {
             type: 'bar',
@@ -1044,7 +1151,8 @@ function renderizarGraficosDeBarra(resultados) {
                 labels: dominio.subdomains.map(s => s.name),
                 datasets: [{
                     label: 'Desempenho',
-                    data: dominio.subdomains.map(s => s.score),
+                    // Para o gráfico, pontuações negativas são mostradas como 0
+                    data: originalScores.map(s => s < 0 ? 0 : s),
                     backgroundColor: dominio.subdomains.map(s => s.color)
                 }]
             },
@@ -1062,7 +1170,12 @@ function renderizarGraficosDeBarra(resultados) {
                     datalabels: {
                         anchor: 'end',
                         align: 'end',
-                        formatter: (value) => value + '%',
+                        formatter: (value, context) => {
+                            // Usa a pontuação original para decidir o que mostrar
+                            const originalScore = originalScores[context.dataIndex];
+                            if (originalScore < 0) return 'N/A';
+                            return value + '%';
+                        },
                         color: 'var(--text-dark)',
                         font: { weight: '500', size: 13 }
                     }
@@ -1072,6 +1185,11 @@ function renderizarGraficosDeBarra(resultados) {
         window.barChartInstances.push(chartInstance);
     });
 }
+
 </script>
 </body>
 </html>
+
+
+
+
