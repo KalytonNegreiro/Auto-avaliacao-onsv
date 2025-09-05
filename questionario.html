@@ -288,12 +288,15 @@
     .grafico-barra-container:last-child {
         margin-bottom: 0;
     }
+    /* AJUSTE DE ESTILO: Centraliza o título dos gráficos de barra */
     .grafico-barra-container h4 {
-        font-size: 1.3rem;
+        font-size: 1.4rem; /* Aumenta a fonte do título */
         color: var(--primary-color);
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         border-bottom: 1px dashed var(--border-color);
-        padding-bottom: 10px;
+        padding-bottom: 15px;
+        text-align: center; /* Centraliza o título */
+        font-weight: 700;
     }
     
     @media (max-width: 768px) {
@@ -691,7 +694,9 @@
     </div>
     <div class="diagnostico-section">
       <h3>Análise Detalhada por Domínio</h3>
-      <div id="graficos-detalhados"></div>
+      <!-- NOVO CONTAINER PARA O GRÁFICO VERTICAL -->
+      <div id="grafico-vertical-container"></div>
+      <div id="graficos-detalhados-horizontais"></div>
     </div>
   </div>
 </div>
@@ -914,7 +919,8 @@ function gerarDiagnosticoCompleto(respostas) {
         Chart.defaults.borderColor = 'var(--border-color)';
 
         renderizarGraficoRadar(resultadosProcessados);
-        renderizarGraficosDeBarra(resultadosProcessados);
+        renderizarGraficoVertical(resultadosProcessados); // NOVO GRÁFICO
+        renderizarGraficosDeBarraHorizontais(resultadosProcessados);
     }, 150);
 }
 
@@ -1073,12 +1079,14 @@ function renderizarTabelaDesempenho(resultados) {
     });
 }
 
-// Gera os gráficos de barras detalhados para cada domínio (FUNÇÃO ATUALIZADA)
-function renderizarGraficosDeBarra(resultados) {
-    const container = document.getElementById('graficos-detalhados');
+// Gera os gráficos de barras horizontais detalhados para cada domínio
+function renderizarGraficosDeBarraHorizontais(resultados) {
+    const container = document.getElementById('graficos-detalhados-horizontais');
     container.innerHTML = '';
 
-    if (window.barChartInstances) window.barChartInstances.forEach(chart => chart.destroy());
+    if (window.barChartInstances) {
+        window.barChartInstances.forEach(chart => chart.destroy());
+    }
     window.barChartInstances = [];
 
     const styles = getComputedStyle(document.documentElement);
@@ -1089,7 +1097,8 @@ function renderizarGraficosDeBarra(resultados) {
         'var(--status-intermediaria)': styles.getPropertyValue('--status-intermediaria').trim(),
         'var(--status-avancada)': styles.getPropertyValue('--status-avancada').trim()
     };
-
+    
+    // CORREÇÃO: Removido o filtro. Agora a função itera sobre todos os resultados.
     resultados.forEach((dominio) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'grafico-barra-container';
@@ -1118,10 +1127,9 @@ function renderizarGraficosDeBarra(resultados) {
                 }]
             },
             options: {
-                // ATUALIZAÇÃO: Aumenta o limite do eixo para dar espaço ao rótulo
                 layout: {
                     padding: {
-                        right: 50 // Adiciona um espaço de 50px à direita do gráfico
+                        right: 50 
                     }
                 },
                 indexAxis: 'y',
@@ -1135,11 +1143,10 @@ function renderizarGraficosDeBarra(resultados) {
                     legend: { display: false },
                     tooltip: { enabled: false },
                     datalabels: {
-                        // ATUALIZAÇÃO: Simplificado para sempre exibir à direita
                         anchor: 'end',
                         align: 'end',
                         color: textDarkColor,
-                        offset: 8, // Aumenta um pouco o espaçamento
+                        offset: 8,
                         formatter: (value) => value + '%',
                         font: { weight: '600', size: 13 }
                     }
@@ -1150,8 +1157,103 @@ function renderizarGraficosDeBarra(resultados) {
     });
 }
 
+// GRÁFICO VERTICAL ATUALIZADO COM MELHORIAS DE DESIGN
+function renderizarGraficoVertical(resultados) {
+    const container = document.getElementById('grafico-vertical-container');
+    if (!container) return;
+    container.innerHTML = ''; 
+
+    const legislacaoData = resultados.find(d => d.domain === 'Legislação Urbanística');
+
+    if (!legislacaoData || legislacaoData.subdomains.length === 0) {
+        return; 
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'grafico-barra-container';
+    const titulo = document.createElement('h4');
+    titulo.textContent = 'Instrumentos da Legislação Urbanística';
+    const canvasContainer = document.createElement('div');
+    canvasContainer.style.position = 'relative';
+    canvasContainer.style.height = '400px'; 
+    const canvas = document.createElement('canvas');
+    
+    canvasContainer.appendChild(canvas);
+    wrapper.appendChild(titulo);
+    wrapper.appendChild(canvasContainer);
+    container.appendChild(wrapper);
+
+    const styles = getComputedStyle(document.documentElement);
+    const textDarkColor = styles.getPropertyValue('--text-dark').trim() || '#343a40';
+    const gridColor = 'rgba(0, 0, 0, 0.1)';
+
+    const wrapXLabels = (label) => {
+        const words = label.split(' ');
+        if (words.length > 2) {
+            const mid = Math.ceil(words.length / 2);
+            return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+        }
+        return label;
+    };
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: legislacaoData.subdomains.map(s => wrapXLabels(s.name)),
+            datasets: [{
+                label: 'Desempenho',
+                data: legislacaoData.subdomains.map(s => s.score),
+                backgroundColor: '#666', // Cor da barra mais suave
+                borderColor: '#444',
+                borderWidth: 1,
+                maxBarThickness: 100
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 115, // Aumenta o espaço superior para o rótulo
+                    title: {
+                        display: true,
+                        text: 'Desempenho (%)',
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    grid: { color: gridColor },
+                    ticks: { callback: value => value <= 100 ? value + '%' : '' } // Oculta ticks > 100
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 12 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                       label: context => ` Desempenho: ${context.raw}%`
+                    }
+                },
+                datalabels: {
+                    anchor: 'end', // Ancora no topo da barra
+                    align: 'end', // Alinha o texto no topo
+                    offset: -8, // Desloca para cima
+                    color: textDarkColor,
+                    formatter: (value) => value + '%',
+                    font: { weight: 'bold', size: 14 } // Fonte maior e em negrito
+                }
+            }
+        }
+    });
+}
+
+
 </script>
 </body>
 </html>
+
 
 
